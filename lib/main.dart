@@ -7,7 +7,7 @@ class ByteBankApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        body: FormularioTransferencia(),
+        body: ListaTransferencias(),
       ),
     );
   }
@@ -19,6 +19,7 @@ class FormularioTransferencia extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('Entrou FormularioTransferencia');
     return Scaffold(
         appBar: AppBar(
           title: Text('Criando Transferência'),
@@ -30,19 +31,22 @@ class FormularioTransferencia extends StatelessWidget {
 
             RaisedButton(
               child: Text('Confirmar'),
-              onPressed: () => _criaTransferencia(),
+              onPressed: () => _criaTransferencia(context),
             )
           ],
         ));
   }
 
-  void _criaTransferencia() {
+  void _criaTransferencia(BuildContext context) {
+    debugPrint('Entrou no _criaTransferencia');
     final int numeroConta =
         int.tryParse(_controllerNumeroConta.text);
     final double valor = double.tryParse(_controllerValor.text);
     if (numeroConta != null && valor != null) {
       final transferenciaCriada = Transferencia(valor, numeroConta);
+      debugPrint('Criando Transferencia');
       debugPrint('$transferenciaCriada');
+      Navigator.pop(context, transferenciaCriada);
     }
   }
 }
@@ -88,6 +92,17 @@ class ListaTransferencias extends StatelessWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          debugPrint('Vai entrar no Future');
+          final Future<Transferencia> future = Navigator.push(context, MaterialPageRoute(builder: (context){
+            return FormularioTransferencia();
+          }));
+          debugPrint('Entrando no Future');
+          future.then((transferenciaRecebida){
+            debugPrint('Passou pelo Future');
+            debugPrint('$transferenciaRecebida');
+          });
+        },
         child: Icon(Icons.add),
       ),
     );
@@ -123,8 +138,10 @@ class Transferencia {
 
   Transferencia(this.valor, this.numeroConta);
 
+
   @override
   String toString() {
+    debugPrint('Executou Transferencia');
     return 'Transferencia{valor: $valor, numeroConta: $numeroConta}';
   }
 }
